@@ -1,0 +1,198 @@
+/*!
+ * GitQuiz - Estilos CSS
+ * Quiz interactivo de preguntas sobre Git para principiantes
+ * HTML5 semántico, sin frameworks ni librerías externas
+ */
+
+/* Variables de colores para consistencia */
+:root {
+    --verde-exito: #28a745;
+    --rojo-error: #dc3545;
+    --amarillo-advertencia: #ffc107;
+    --azul-primary: #333;
+    --gris-claro: #f8f9fa;
+    --blanco: #ffffff;
+}
+
+/* Reset y bases */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background-color: var(--gris-claro);
+    color: var(--azul-primary);
+    line-height: 1.6;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    background: var(--blanco);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-height: 400px;
+}
+
+/* Encabezado */
+header {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+header h1 {
+    font-size: 2rem;
+    color: var(--azul-primary);
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* Sección del quiz */
+.quiz-section {
+    padding: 2rem 1rem;
+}
+
+.pregunta {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: var(--azul-primary);
+    min-height: 3rem; /* Espacio vertical para la pregunta */
+}
+
+/* Contenedor de opciones */
+.opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Estilo para cada botón de opción */
+.opcion {
+    background-color: var(--blanco);
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    color: var(--azul-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Efecto al pasar el mouse */
+.opcion:hover:not(.correcta):not(.incorrecta) {
+    border-color: var(--azul-primary);
+    background-color: #e9ecef;
+}
+
+/* Estado: Respuesta Correcta */
+.opcion.correcta {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+/* Estado: Respuesta Incorrecta */
+.opcion.incorrecta {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+/* Barra de progreso */
+.progreso {
+    margin-bottom: 2rem;
+    padding: 0.5rem 1rem;
+    background-color: #e9ecef;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--azul-primary);
+}
+
+.progreso span {
+    margin-right: 1rem;
+}
+
+/* Barra visual de progreso */
+.barra-progreso {
+    width: 100%;
+    height: 8px;
+    background-color: #dee2e6;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progreso-actual {
+    height: 100%;
+    background-color: var(--verde-exito);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Botón de siguiente */
+.btn-siguiente {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--azul-primary);
+    color: var(--blanco);
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-siguiente:hover {
+    background-color: #555;
+}
+
+/* Botón de reiniciar (en pantalla final) */
+.btn-reiniciar {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: var(--azul-primary);
+    color: var(--blanco);
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    text-decoration: none;
+}
+
+.btn-reiniciar:hover {
+    background-color: #555;
+}
+
+/* Responsive: pantallas más pequeñas */
+@media (max-width: 480px) {
+    .container {
+        margin: 1rem;
+        border-radius: 4px;
+    }
+
+    .opcion {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-siguiente,
+    .btn-reiniciar {
+        font-size: 0.9rem;
+        padding: 0.8rem;
+    }
+}

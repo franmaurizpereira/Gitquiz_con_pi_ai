@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitQuiz - Quiz de Git para Principiantes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>GitQuiz</h1>
+            <p>Prueba tus conocimientos sobre Git</p>
+        </header>
+
+        <section class="quiz-section" id="quiz-section">
+            <!-- La pregunta y opciones se insertan dinámicamente -->
+            <div class="pregunta" id="pregunta">Selecciona una pregunta...</div>
+
+            <div class="opciones" id="opciones">
+                <!-- Las opciones se insertan desde quiz.js -->
+            </div>
+
+            <div class="progreso">
+                <span id="progreso">1 de 20</span>
+                <div class="barra-progreso" id="barra-progreso">
+                    <div class="progreso-actual" id="progreso-actual"></div>
+                </div>
+            </div>
+
+            <button class="btn-siguiente" id="siguiente">Responder</button>
+        </section>
+
+        <footer>
+            <p>Quiz educativo sobre Git para aprendices</p>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+    <script src="quiz.js"></script>
+</body>
+</html>
