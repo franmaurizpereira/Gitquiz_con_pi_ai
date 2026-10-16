@@ -2,7 +2,7 @@
 // Cada pregunta tiene 4 opciones, la correcta y una explicación
 
 // Arreglo de preguntas del quiz
-export const quizData = [
+const quizData = [
     {
         pregunta: "1. ¿Qué comando se usa para inicializar un repositorio Git?",
         opciones: [
@@ -217,135 +217,10 @@ export const quizData = [
         opciones: [
             "A) git help comando",
             "B) git comando --help",
-            C) both A and B are correct",
+            "C) Las opciones A y B son válidas",
             "D) git docs comando"
         ],
         correcta: 2,
-        explicacion: "Ambas formas funcionan: `git help <comando>` y `git <comando> --abbrev-commit` (o `--help` en algunos sistemas). Abre el manual del sistema o el help integrado de Git."
+        explicacion: "Ambas formas funcionan: `git help <comando>` abre el manual completo, y `git <comando> --help` muestra la ayuda del comando concreto. También `git <comando> -h` ofrece un resumen rápido."
     }
 ];
-
-// Elementos del DOM que usaremos
-const preguntaEl = document.getElementById('pregunta');
-const opcionesEl = document.querySelectorAll('.opcion');
-const progresoEl = document.getElementById('progreso');
-const siguienteBtn = document.getElementById('siguiente');
-const reiniciarBtn = document.getElementById('reiniciar');
-
-// Estado del quiz
-let actualIdx = 0;
-let aciertos = 0;
-
-// Función para cargar la pregunta actual
-function cargarPregunta() {
-    const actual = quizData[actualIdx];
-    
-    // Mostrar la pregunta
-    preguntaEl.textContent = actual.pregunta;
-    
-    // Limpiar opciones anteriores
-    opcionesEl.forEach((opcion, idx) => {
-        opcion.textContent = actual.opciones[idx];
-        opcion.classList.remove('correcta', 'incorrecta'); // Resetear clases
-        opcion.style.backgroundColor = ''; // Resetear color de fondo
-    });
-    
-    // Actualizar la barra de progreso
-    const progreso = ((actualIdx + 1) / quizData.length) * 100;
-    progresoEl.style.width = `${progreso}%`;
-    progresoEl.textContent = `${actualIdx + 1} de ${quizData.length}`;
-}
-
-// Función para verificar la respuesta
-function verificarRespuesta(e) {
-    const seleccionado = e.target;
-    const idx = Array.from(opcionesEl).indexOf(seleccionado);
-    
-    const actual = quizData[actualIdx];
-    
-    // Deshabilitar todas las opciones para que el usuario no pueda cambiar de opinión
-    opcionesEl.forEach(op => op.disabled = true);
-    
-    if (idx === actual.correcta) {
-        // Respuesta correcta
-        seleccionado.classList.add('correcta');
-        seleccionado.style.backgroundColor = 'd4edda'; // Verde muy claro
-        aciertos++;
-    } else {
-        // Respuesta incorrecta
-        seleccionado.classList.add('incorrecta');
-        seleccionado.style.backgroundColor = 'f8d7da'; // Rojo muy claro
-        
-        // Mostrar la correcta en verde
-        opcionesEl.forEach(op => {
-            if (Array.from(opcionesEl).indexOf(op) === actual.correcta) {
-                op.classList.add('correcta');
-                op.style.backgroundColor = 'd4edda';
-            }
-        });
-    }
-    
-    // Cambiar texto del botón siguiente
-    siguienteBtn.textContent = 'Siguiente pregunta';
-}
-
-// Función para ir a la siguiente pregunta o mostrar pantalla de resultados
-function siguientePregunta() {
-    if (actualIdx < quizData.length - 1) {
-        actualIdx++;
-        cargarPregunta();
-        siguienteBtn.textContent = 'Responder';
-        // Re-habilitar opciones para la próxima pregunta
-        opcionesEl.forEach(op => {
-            op.disabled = false;
-            op.classList.remove('correcta', 'incorrecta');
-            op.style.backgroundColor = '';
-        });
-    } else {
-        // Mostrar pantalla final
-        mostrarResultado();
-    }
-}
-
-// Función para mostrar la pantalla de resultados
-function mostrarResultado() {
-    const container = document.querySelector('.container');
-    container.innerHTML = `
-        <div class="resultado-final">
-            <h2>¡Quiz completado!</h2>
-            <p>Tu puntuación: ${aciertos} de ${quizData.length}</p>
-            <p>Porcentaje: ${((aciertos / quizData.length) * 100).toFixed(1)}%</p>
-            <button id="reiniciarBtn" class="btn-reiniciar">Jugar de nuevo</button>
-        </div>
-    `;
-    
-    // Agregar evento al botón de reiniciar
-    const reiniciarBtnNuevo = document.getElementById('reiniciarBtn');
-    reiniciarBtnNuevo.addEventListener('click', iniciarQuiz);
-}
-
-// Función para iniciar o reiniciar el quiz
-function iniciarQuiz() {
-    actualIdx = 0;
-    aciertos = 0;
-    cargarPregunta();
-    siguienteBtn.textContent = 'Responder';
-    
-    // Re-habilitar/Resetear elementos
-    opcionesEl.forEach(op => {
-        op.disabled = false;
-        op.classList.remove('correcta', 'incorrecta');
-        op.style.backgroundColor = '';
-    });
-}
-
-// Event listeners
-opcionesEl.forEach(opcion => {
-    opcion.addEventListener('click', verificarRespuesta);
-});
-
-siguienteBtn.addEventListener('click', siguientePregada);
-reiniciarBtn.addEventListener('click', iniciarQuiz);
-
-// Iniciar el quiz al cargar la página
-document.addEventListener('DOMContentLoaded', iniciarQuiz);

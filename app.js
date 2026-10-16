@@ -1,211 +1,215 @@
-// GitQuiz - Aplicación Principal (app.js)
-// Gestiona la interacción del usuario con el quiz de Git
+// ============================================================
+// GitQuiz - Lógica principal de la aplicación (app.js)
+// Depende de: quiz.js (define la variable global quizData)
+// Sin módulos ES ni librerías externas.
+// ============================================================
 
-// Referencias a elementos del DOM
-const preguntaEl = document.getElementById('pregunta');
-const opcionesEl = document.querySelectorAll('.opcion'); // NodeList en vivo
-const progresoEl = document.getElementById('progreso');
-const barraProgresoEl = document.getElementById('barra-progreso');
-const siguienteBtn = document.getElementById('siguiente');
-const container = document.querySelector('.container');
+// --- Referencias a los elementos del DOM ---
+let preguntaEl = document.getElementById('pregunta');
+let opcionesEl = document.getElementById('opciones');
+let explicacionEl = document.getElementById('explicacion');
+let progresoEl = document.getElementById('progreso');
+let barraProgresoEl = document.getElementById('barra-progreso');
+let siguienteBtn = document.getElementById('siguiente');
+const quizSection = document.getElementById('quiz-section');
 
-// Importar las preguntas desde quiz.js
-// Esto asume que quiz.js exporta la variable quizData
-// Si no hay módulos, las variables globales estarán disponibles
-import { quizData } from './quiz.js';
+// --- Estado del quiz ---
+let actualIdx = 0;      // Índice de la pregunta actual (0-based)
+let aciertos = 0;       // Contador de respuestas correctas
+let respondida = false; // ¿Ya se respondió la pregunta actual?
 
-// Estado del quiz
-let actualIdx = 0;
-let aciertos = 0;
-
-// Inicializar la aplicación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', iniciarQuiz);
-
-/**
- * Inicia o reinicia el quiz
- * - Reinicia los índices y puntuación
- * - Carga la primera pregunta
- * - Configura los event listeners
- */
+// ============================================================
+// Función: iniciarQuiz
+// Reinicia el estado y vuelve a pintar la primera pregunta.
+// ============================================================
 function iniciarQuiz() {
     actualIdx = 0;
     aciertos = 0;
+    respondida = false;
 
-    // Ocultar cualquier resultado anterior y mostrar sección del quiz
-    const resultadoActual = document.querySelector('.resultado-final');
-    if (resultadoActual) {
-        resultadoActual.remove();
+    // Nos aseguramos de que la sección del quiz esté visible
+    // (por si venimos de la pantalla de resultados).
+    quizSection.hidden = false;
+
+    // Reconstruimos la estructura interna por si fue reemplazada
+    // al mostrar la pantalla final.
+    if (!document.getElementById('pregunta')) {
+        reconstruirEstructura();
     }
 
-    // Habilitar todas las opciones
-    opcionesEl.forEach(op => {
-        op.disabled = false;
-        op.classList.remove('correcta', 'incorrecta');
-        op.style.backgroundColor = '';
-    });
-
-    cargarPregunta();
-    siguienteBtn.textContent = 'Responder';
+    renderPregunta();
 }
 
-/**
- * Carga la pregunta actual en la interfaz de usuario
- * - Actualiza el texto de la pregunta
- * - Configura las opciones con sus eventos
- * - Actualiza la barra de progreso
- */
-function cargarPregunta() {
+// ============================================================
+// Función: reconstruirEstructura
+// Vuelve a crear el HTML interno del quiz tras la pantalla final.
+// ============================================================
+function reconstruirEstructura() {
+    quizSection.innerHTML = `
+        <div class="progreso">
+            <span id="progreso">1 de ${quizData.length}</span>
+            <div class="barra-progreso">
+                <div class="progreso-actual" id="barra-progreso"></div>
+            </div>
+        </div>
+        <h2 class="pregunta" id="pregunta"></h2>
+        <div class="opciones" id="opciones"></div>
+        <p class="explicacion" id="explicacion" hidden></p>
+        <button class="btn-siguiente" id="siguiente" disabled>Responder</button>
+    `;
+
+    // Reasignamos las referencias a los nuevos nodos
+    preguntaEl = document.getElementById('pregunta');
+    opcionesEl = document.getElementById('opciones');
+    explicacionEl = document.getElementById('explicacion');
+    progresoEl = document.getElementById('progreso');
+    barraProgresoEl = document.getElementById('barra-progreso');
+    siguienteBtn = document.getElementById('siguiente');
+
+    // Reasignamos el listener del botón siguiente
+    siguienteBtn.addEventListener('click', siguientePregunta);
+}
+
+// ============================================================
+// Función: renderPregunta
+// Pinta la pregunta actual, sus 4 opciones y la barra de progreso.
+// ============================================================
+function renderPregunta() {
     const actual = quizData[actualIdx];
+    respondida = false;
 
-    // Mostrar la pregunta
-    if (preguntaEl) {
-        preguntaEl.textContent = actual.pregunta;
-    }
+    // 1) Enunciado
+    preguntaEl.textContent = actual.pregunta;
 
-    // Configurar las opciones
-    opcionesEl.forEach((opcion, idx) => {
-        // Establecer el texto de la opción
-        if (opcion) {
-            opcion.textContent = actual.opciones[idx];
-        }
-
-        // Resetear clases y estilos (para empezar limpios)
-        opcion.classList.remove('correcta', 'incorrecta');
-        opcion.style.backgroundColor = '';
-        opcion.style.color = ''; // Resetear color de texto
-
-        // Agregar evento de clic (solo si no ya está agregado)
-        opcion.replaceWith(opcion.cloneNode(true)); // Truco para resetear event listeners
-        const nuevaOpcion = document.querySelectorAll('.opcion')[idx];
-        nuevaOpcion.addEventListener('click', verificarRespuesta);
+    // 2) Opciones: creamos un <button> real por cada opción
+    opcionesEl.innerHTML = '';
+    actual.opciones.forEach((texto, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'opcion';
+        btn.textContent = texto;
+        btn.dataset.idx = idx;
+        btn.addEventListener('click', () => seleccionarOpcion(idx));
+        opcionesEl.appendChild(btn);
     });
 
-    // Actualizar la barra de progreso
+    // 3) Explicación oculta hasta responder
+    explicacionEl.hidden = true;
+    explicacionEl.textContent = '';
+
+    // 4) Botón siguiente deshabilitado hasta responder
+    siguienteBtn.disabled = true;
+    siguienteBtn.textContent =
+        actualIdx === quizData.length - 1 ? 'Ver resultados' : 'Responder';
+
+    // 5) Barra de progreso
     actualizarProgreso();
 }
 
-/**
- * Actualiza la barra de progreso visual y el texto
- * @param {number} idx - Índice actual de la pregunta (0-based)
- */
+// ============================================================
+// Función: actualizarProgreso
+// Actualiza el ancho de la barra y el texto "X de N".
+// ============================================================
 function actualizarProgreso() {
-    if (progresoEl && barraProgresoEl) {
-        const porcentaje = ((actualIdx + 1) / quizData.length) * 100;
-        barraProgresoEl.style.width = `${porcentaje}%`;
-        progresoEl.textContent = `${actualIdx + 1} de ${quizData.length}`;
-    }
+    const total = quizData.length;
+    const porcentaje = ((actualIdx + 1) / total) * 100;
+    barraProgresoEl.style.width = porcentaje + '%';
+    progresoEl.textContent = (actualIdx + 1) + ' de ' + total;
 }
 
-/**
- * Verifica la respuesta seleccionada por el usuario
- * @param {Event} e - Evento de clic
- */
-function verificarRespuesta(e) {
-    const seleccionado = e.target;
-    const idx = Array.from(opcionesEl).indexOf(seleccionado);
-    
+// ============================================================
+// Función: seleccionarOpcion
+// Comprueba la respuesta, colorea acierto/fallo y muestra la
+// explicación. Solo permite responder una vez por pregunta.
+// ============================================================
+function seleccionarOpcion(idxElegido) {
+    if (respondida) return; // Evita doble respuesta
+    respondida = true;
+
     const actual = quizData[actualIdx];
+    const botones = opcionesEl.querySelectorAll('.opcion');
 
-    // Deshabilitar todas las opciones para evitar múltiples clics
-    opcionesEl.forEach(op => op.disabled = true);
+    // Recorremos los botones para colorearlos
+    botones.forEach((btn) => {
+        const idx = Number(btn.dataset.idx);
+        btn.disabled = true; // Bloquea clics posteriores
 
-    // Resetear color de fondo anterior en todas
-    opcionesEl.forEach(op => {
-        op.style.backgroundColor = '';
+        if (idx === actual.correcta) {
+            // La correcta SIEMPRE se marca en verde
+            btn.classList.add('correcta');
+        }
+        if (idx === idxElegido && idx !== actual.correcta) {
+            // La elegida por el usuario, si es errónea, en rojo
+            btn.classList.add('incorrecta');
+        }
     });
 
-    if (idx === actual.correcta) {
-        // === RESPUESTA CORRECTA ===
-        seleccionado.classList.add('correcta');
-        seleccionado.style.backgroundColor = '#d4edda'; // Verde muy claro
-        seleccionado.style.color = '#155724';
+    // Sumamos acierto si procede
+    if (idxElegido === actual.correcta) {
         aciertos++;
-    } else {
-        // === RESPUESTA INCORRECTA ===
-        seleccionado.classList.add('incorrecta');
-        seleccionado.style.backgroundColor = '#f8d7da'; // Rojo muy claro
-        seleccionado.style.color = '#721c24';
-
-        // Resaltar la respuesta correcta en verde
-        opcionesEl.forEach(op => {
-            const opIdx = Array.from(opcionesEl).indexOf(op);
-            if (opIdx === actual.correcta) {
-                op.classList.add('correcta');
-                op.style.backgroundColor = '#d4edda';
-                op.style.color = '#155724';
-            }
-        });
     }
 
-    // Cambiar texto del botón a "Siguiente pregunta"
-    if (siguienteBtn) {
-        siguienteBtn.textContent = 'Siguiente pregunta';
-    }
+    // Mostramos la explicación
+    explicacionEl.textContent = actual.explicacion;
+    explicacionEl.hidden = false;
+
+    // Habilitamos el avance
+    siguienteBtn.disabled = false;
 }
 
-/**
- * Navega a la siguiente pregunta o muestra la pantalla final
- */
+// ============================================================
+// Función: siguientePregunta
+// Avanza a la siguiente pregunta o muestra el resultado final.
+// ============================================================
 function siguientePregunta() {
+    if (!respondida) return; // No avanza sin responder
+
     if (actualIdx < quizData.length - 1) {
         actualIdx++;
-        cargarPregunta();
-        siguienteBtn.textContent = 'Responder';
-        
-        // Re-habilitar opciones para la próxima pregunta (ya resetearon sus clases)
-        opcionesEl.forEach(op => {
-            op.disabled = false;
-            op.classList.remove('correcta', 'incorrecta');
-            op.style.backgroundColor = '';
-            op.style.color = '';
-        });
+        renderPregunta();
     } else {
-        // Mostrar pantalla de resultados finales
         mostrarResultado();
     }
 }
 
-/**
- * Muestra la pantalla final con la puntuación
- */
+// ============================================================
+// Función: mostrarResultado
+// Sustituye el quiz por la pantalla final con la puntuación.
+// ============================================================
 function mostrarResultado() {
-    const porcentaje = ((aciertos / quizData.length) * 100).toFixed(1);
-    
-    const resultadoHTML = `
+    const total = quizData.length;
+    const porcentaje = Math.round((aciertos / total) * 100);
+
+    // Mensaje según el porcentaje obtenido
+    let mensaje;
+    if (porcentaje === 100) {
+        mensaje = '¡PERFECTO! Dominas Git como un auténtico senior.';
+    } else if (porcentaje >= 70) {
+        mensaje = '¡Buen trabajo! Tienes una base sólida de Git.';
+    } else if (porcentaje >= 40) {
+        mensaje = 'Vas por buen camino, sigue practicando.';
+    } else {
+        mensaje = 'Toca repasar la documentación de Git. ¡Ánimo!';
+    }
+
+    quizSection.innerHTML = `
         <div class="resultado-final">
-            <h2>¡Quiz completado!</h2>
-            <p>Obtuviste <strong>${aciertos}</strong> de <strong>${quizData.length}</strong> correctas</p>
-            <p>Porcentaje: <strong>${porcentaje}%</strong></p>
-            <a href="#" id="reiniciarBtn" class="btn-reiniciar">Jugar de nuevo</a>
+            <h2>GAME OVER</h2>
+            <p class="marcador">PUNTUACIÓN: ${aciertos} / ${total}</p>
+            <p class="marcador">PRECISIÓN: ${porcentaje}%</p>
+            <p class="mensaje-final">${mensaje}</p>
+            <button class="btn-reiniciar" id="reiniciar">INSERT COIN - JUGAR DE NUEVO</button>
         </div>
     `;
 
-    // Insertar el resultado en el container
-    if (container) {
-        container.insertAdjacentHTML('beforeend', resultadoHTML);
-    }
-
-    // Agregar evento al botón de reiniciar
-    const nuevoReiniciar = document.getElementById('reiniciarBtn');
-    if (nuevoReiniciar) {
-        nuevoReiniciar.addEventListener('click', (e) => {
-            e.preventDefault();
-            iniciarQuiz();
-        });
-    }
+    // El botón de reinicio inicia todo de nuevo
+    document.getElementById('reiniciar').addEventListener('click', iniciarQuiz);
 }
 
-// Event listeners para la navegación
-if (siguienteBtn) {
-    siguienteBtn.addEventListener('click', () => {
-        // Verificar si ya respondió (tiene clase correcta/incorrecta)
-        const opcionesSeleccionadas = document.querySelector('.opcion.correcta, .opcion.incorrecta');
-        if (opcionesSeleccionadas) {
-            // Ya respondió, ir a siguiente pregunta
-            siguientePregunta();
-        } else {
-            // Todno no responde, verificar esta vez
-            verificarRespuesta({ target: document.querySelector('.opcion:checked') || event.target });
-        }
-    });
-}
+// ============================================================
+// Arranque: cuando el DOM esté listo, configuramos y pintamos.
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    siguienteBtn.addEventListener('click', siguientePregunta);
+    iniciarQuiz();
+});

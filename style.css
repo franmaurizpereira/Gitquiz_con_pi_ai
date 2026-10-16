@@ -1,198 +1,417 @@
-/*!
- * GitQuiz - Estilos CSS
- * Quiz interactivo de preguntas sobre Git para principiantes
- * HTML5 semántico, sin frameworks ni librerías externas
- */
+/* ============================================================
+   GitQuiz - Hoja de estilos (style.css)
+   Estilo retro "arcade 1980": neón, CRT, scanlines y píxeles.
+   Sin frameworks ni librerías externas.
+   ============================================================ */
 
-/* Variables de colores para consistencia */
+/* ---------- Variables de color ---------- */
 :root {
-    --verde-exito: #28a745;
-    --rojo-error: #dc3545;
-    --amarillo-advertencia: #ffc107;
-    --azul-primary: #333;
-    --gris-claro: #f8f9fa;
-    --blanco: #ffffff;
+    --bg-1: #05010f;          /* fondo más oscuro */
+    --bg-2: #12002e;          /* degradado morado profundo */
+    --neon-cyan: #00fff7;     /* cian brillante */
+    --neon-magenta: #ff2ecc;  /* magenta */
+    --neon-yellow: #ffe600;   /* amarillo */
+    --neon-green: #39ff14;    /* verde acierto */
+    --neon-red: #ff2b4e;      /* rojo fallo */
+    --neon-orange: #ff8a00;   /* naranja secundario */
+    --texto: #d7f9ff;         /* texto claro */
 }
 
-/* Reset y bases */
+/* ---------- Reset y base ---------- */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+html, body {
+    min-height: 100%;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-    background-color: var(--gris-claro);
-    color: var(--azul-primary);
+    /* Tipografía monoespaciada de estilo terminal */
+    font-family: "Courier New", "Lucida Console", "DejaVu Sans Mono", monospace;
+    color: var(--texto);
+    text-transform: uppercase;      /* Todo en mayúsculas, muy ochentero */
+    letter-spacing: 1px;
     line-height: 1.6;
+
+    /* Fondo estrellado + rejilla de perspectiva retro */
+    background-color: var(--bg-1);
+    background-image:
+        radial-gradient(2px 2px at 20% 30%, #ffffff, transparent),
+        radial-gradient(1px 1px at 70% 60%, #9ad7ff, transparent),
+        radial-gradient(1px 1px at 40% 80%, #ffffff, transparent),
+        radial-gradient(2px 2px at 85% 15%, #ff9bf0, transparent),
+        radial-gradient(1px 1px at 10% 70%, #ffffff, transparent),
+        radial-gradient(circle at 50% 120%, var(--bg-2), transparent 60%),
+        linear-gradient(180deg, var(--bg-1) 0%, #0a0320 60%, #1a0038 100%);
+    background-attachment: fixed;
 }
 
-/* Contenedor principal */
+/* Capa de scanlines tipo monitor CRT */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.28) 0px,
+        rgba(0, 0, 0, 0.28) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    animation: parpadeo-crt 4s infinite;
+}
+
+/* Ligero parpadeo del monitor */
+@keyframes parpadeo-crt {
+    0%, 96%, 100% { opacity: 1; }
+    97% { opacity: 0.82; }
+    98% { opacity: 0.95; }
+    99% { opacity: 0.88; }
+}
+
+/* ---------- Contenedor principal (el "arcade") ---------- */
 .container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    background: var(--blanco);
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    min-height: 400px;
+    max-width: 820px;
+    margin: 2.5rem auto;
+    padding: 0 1.25rem 1.5rem;
+    min-height: 420px;
+
+    background: linear-gradient(180deg, rgba(10, 2, 35, 0.94), rgba(20, 0, 45, 0.94));
+    border: 3px solid var(--neon-cyan);
+    border-radius: 4px;
+
+    /* Marco con resplandor neón multicapa */
+    box-shadow:
+        0 0 0 3px #000,
+        0 0 12px var(--neon-cyan),
+        0 0 30px rgba(0, 255, 247, 0.45),
+        inset 0 0 30px rgba(0, 255, 247, 0.12);
 }
 
-/* Encabezado */
+/* ---------- Encabezado ---------- */
 header {
     text-align: center;
-    padding: 2rem 1rem;
-    border-bottom: 2px solid #e9ecef;
+    padding: 2rem 1rem 1.5rem;
+    border-bottom: 2px dashed rgba(0, 255, 247, 0.35);
+    margin-bottom: 1.5rem;
 }
 
 header h1 {
-    font-size: 2rem;
-    color: var(--azul-primary);
-    margin-bottom: 0.5rem;
+    font-size: 2.6rem;
+    font-weight: bold;
+    color: var(--neon-yellow);
+    letter-spacing: 6px;
+    /* Efecto letrero neón con sombra cromática */
+    text-shadow:
+        0 0 4px #fff,
+        0 0 10px var(--neon-yellow),
+        0 0 22px var(--neon-orange),
+        3px 3px 0 var(--neon-magenta);
+    animation: latido-neon 2.4s infinite alternate;
+}
+
+@keyframes latido-neon {
+    from { text-shadow: 0 0 4px #fff, 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-orange), 3px 3px 0 var(--neon-magenta); }
+    to   { text-shadow: 0 0 6px #fff, 0 0 16px var(--neon-yellow), 0 0 34px var(--neon-orange), 3px 3px 0 var(--neon-magenta); }
 }
 
 header p {
-    color: #666;
-    font-size: 1rem;
+    margin-top: 0.75rem;
+    color: var(--neon-cyan);
+    font-size: 0.85rem;
+    text-shadow: 0 0 8px rgba(0, 255, 247, 0.7);
 }
 
-/* Sección del quiz */
+/* ---------- Sección del quiz ---------- */
 .quiz-section {
-    padding: 2rem 1rem;
+    padding: 0 0.5rem 0.5rem;
 }
 
-.pregunta {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    color: var(--azul-primary);
-    min-height: 3rem; /* Espacio vertical para la pregunta */
-}
-
-/* Contenedor de opciones */
-.opciones {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-/* Estilo para cada botón de opción */
-.opcion {
-    background-color: var(--blanco);
-    border: 2px solid #dee2e6;
-    border-radius: 6px;
-    padding: 1rem 1.2rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 1rem;
-    color: var(--azul-primary);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* Efecto al pasar el mouse */
-.opcion:hover:not(.correcta):not(.incorrecta) {
-    border-color: var(--azul-primary);
-    background-color: #e9ecef;
-}
-
-/* Estado: Respuesta Correcta */
-.opcion.correcta {
-    background-color: #d4edda;
-    border-color: #28a745;
-    color: #155724;
-}
-
-/* Estado: Respuesta Incorrecta */
-.opcion.incorrecta {
-    background-color: #f8d7da;
-    border-color: #dc3545;
-    color: #721c24;
-}
-
-/* Barra de progreso */
+/* ---------- Barra de progreso ---------- */
 .progreso {
-    margin-bottom: 2rem;
-    padding: 0.5rem 1rem;
-    background-color: #e9ecef;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    color: var(--azul-primary);
+    margin-bottom: 1.5rem;
+    padding: 0.6rem 0.9rem;
+    border: 2px solid var(--neon-magenta);
+    background: rgba(255, 46, 204, 0.08);
+    box-shadow: 0 0 10px rgba(255, 46, 204, 0.4), inset 0 0 10px rgba(255, 46, 204, 0.2);
+    font-size: 0.8rem;
+    color: var(--neon-magenta);
+    text-shadow: 0 0 6px rgba(255, 46, 204, 0.8);
 }
 
-.progreso span {
-    margin-right: 1rem;
-}
-
-/* Barra visual de progreso */
 .barra-progreso {
     width: 100%;
-    height: 8px;
-    background-color: #dee2e6;
-    border-radius: 4px;
+    height: 14px;
+    margin-top: 0.6rem;
+    background: #000;
+    border: 2px solid var(--neon-magenta);
     overflow: hidden;
-    margin-top: 0.5rem;
 }
 
 .progreso-actual {
     height: 100%;
-    background-color: var(--verde-exito);
     width: 0%;
-    transition: width 0.3s ease;
+    /* Rayas tipo "medidor" arcade */
+    background-image: repeating-linear-gradient(
+        45deg,
+        var(--neon-green) 0px, var(--neon-green) 6px,
+        #0b6b00 6px, #0b6b00 12px
+    );
+    box-shadow: 0 0 12px var(--neon-green);
+    transition: width 0.35s steps(8);
 }
 
-/* Botón de siguiente */
+/* ---------- Pregunta ---------- */
+.pregunta {
+    min-height: 3.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.15rem;
+    color: #fff;
+    text-shadow: 0 0 6px rgba(0, 255, 247, 0.8), 0 0 14px rgba(0, 255, 247, 0.4);
+}
+
+/* ---------- Opciones (botones arcade) ---------- */
+.opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.opcion {
+    font-family: inherit;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: left;
+
+    padding: 0.9rem 1.1rem;
+    color: var(--texto);
+    background: linear-gradient(180deg, #13063a, #0a0224);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 2px;
+    cursor: pointer;
+
+    box-shadow: 0 0 8px rgba(0, 255, 247, 0.35), inset 0 -3px 0 rgba(0, 0, 0, 0.6);
+    transition: transform 0.08s, box-shadow 0.15s, background 0.15s;
+}
+
+/* Hover: se ilumina y "salta" un poco */
+.opcion:hover:not(:disabled) {
+    background: linear-gradient(180deg, #20115c, #0e0433);
+    box-shadow: 0 0 16px var(--neon-cyan), inset 0 -3px 0 rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Al pulsar: se hunde como botón real */
+.opcion:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 0 6px var(--neon-cyan);
+}
+
+/* ---------- Estado CORRECTO (verde neón) ---------- */
+.opcion.correcta {
+    color: #032400;
+    background: linear-gradient(180deg, #6dff4d, #1fbf00);
+    border-color: #eaffea;
+    box-shadow: 0 0 18px var(--neon-green), inset 0 -3px 0 rgba(0, 0, 0, 0.35);
+    text-shadow: none;
+    animation: destello-verde 0.5s steps(2) 2;
+}
+
+@keyframes destello-verde {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.6); }
+}
+
+/* ---------- Estado INCORRECTO (rojo neón) ---------- */
+.opcion.incorrecta {
+    color: #2a0006;
+    background: linear-gradient(180deg, #ff6b83, #d10024);
+    border-color: #ffe3e7;
+    box-shadow: 0 0 18px var(--neon-red), inset 0 -3px 0 rgba(0, 0, 0, 0.35);
+    text-shadow: none;
+    animation: temblor 0.3s steps(2) 2;
+}
+
+/* Pequeño temblor al fallar */
+@keyframes temblor {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* ---------- Explicación ---------- */
+.explicacion {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem;
+    font-size: 0.85rem;
+    color: var(--neon-yellow);
+    text-transform: none;         /* El texto largo se lee mejor normal */
+    letter-spacing: 0.5px;
+
+    background: rgba(255, 230, 0, 0.06);
+    border-left: 4px solid var(--neon-yellow);
+    box-shadow: inset 0 0 14px rgba(255, 230, 0, 0.15);
+    text-shadow: 0 0 5px rgba(255, 230, 0, 0.5);
+}
+
+/* ---------- Botón siguiente ---------- */
 .btn-siguiente {
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 1rem;
+    font-weight: bold;
+
     width: 100%;
-    padding: 1rem;
-    background-color: var(--azul-primary);
-    color: var(--blanco);
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
     margin-top: 1.5rem;
-    transition: background-color 0.2s;
-}
+    padding: 1rem;
 
-.btn-siguiente:hover {
-    background-color: #555;
-}
-
-/* Botón de reiniciar (en pantalla final) */
-.btn-reiniciar {
-    display: inline-block;
-    padding: 1rem 2rem;
-    background-color: var(--azul-primary);
-    color: var(--blanco);
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
+    color: #1a0038;
+    background: linear-gradient(180deg, var(--neon-yellow), var(--neon-orange));
+    border: 2px solid #fff;
+    border-radius: 2px;
     cursor: pointer;
-    margin-top: 1rem;
-    text-decoration: none;
+
+    box-shadow: 0 0 14px var(--neon-yellow), inset 0 -4px 0 rgba(0, 0, 0, 0.35);
+    transition: transform 0.08s, box-shadow 0.15s;
+}
+
+.btn-siguiente:hover:not(:disabled) {
+    box-shadow: 0 0 24px var(--neon-yellow), inset 0 -4px 0 rgba(0, 0, 0, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-siguiente:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+/* Deshabilitado: apagado y sin brillo */
+.btn-siguiente:disabled {
+    background: #2a2a3a;
+    color: #6d6d80;
+    border-color: #444;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* ---------- Pantalla final ---------- */
+.resultado-final {
+    text-align: center;
+    padding: 1.5rem 0.5rem;
+}
+
+.resultado-final h2 {
+    font-size: 2rem;
+    color: var(--neon-magenta);
+    letter-spacing: 6px;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 8px #fff, 0 0 20px var(--neon-magenta), 0 0 40px var(--neon-magenta);
+    animation: latido-neon 1.2s infinite alternate;
+}
+
+.marcador {
+    font-size: 1.15rem;
+    margin: 0.6rem 0;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(0, 255, 247, 0.8);
+}
+
+.mensaje-final {
+    margin: 1.25rem 0;
+    font-size: 0.9rem;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 6px rgba(255, 230, 0, 0.7);
+}
+
+/* Texto parpadeante "INSERT COIN" */
+.mensaje-final::after {
+    content: "▌";
+    margin-left: 4px;
+    animation: cursor 0.9s steps(1) infinite;
+}
+
+@keyframes cursor {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+}
+
+.btn-reiniciar {
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+
+    padding: 1rem 1.75rem;
+    color: #1a0038;
+    background: linear-gradient(180deg, var(--neon-green), #0f9d00);
+    border: 2px solid #fff;
+    border-radius: 2px;
+    cursor: pointer;
+
+    box-shadow: 0 0 16px var(--neon-green), inset 0 -4px 0 rgba(0, 0, 0, 0.35);
+    transition: transform 0.08s, box-shadow 0.15s;
+    animation: destello-verde 1.4s steps(2) infinite;
 }
 
 .btn-reiniciar:hover {
-    background-color: #555;
+    box-shadow: 0 0 26px var(--neon-green), inset 0 -4px 0 rgba(0, 0, 0, 0.35);
+    transform: translateY(-2px);
 }
 
-/* Responsive: pantallas más pequeñas */
+.btn-reiniciar:active {
+    transform: translateY(1px);
+}
+
+/* ---------- Pie de página ---------- */
+footer {
+    text-align: center;
+    padding: 1.5rem 1rem 0.5rem;
+    margin-top: 1rem;
+    border-top: 2px dashed rgba(255, 46, 204, 0.35);
+    font-size: 0.7rem;
+    color: var(--neon-magenta);
+    text-shadow: 0 0 6px rgba(255, 46, 204, 0.6);
+}
+
+/* ---------- Responsive ---------- */
 @media (max-width: 480px) {
     .container {
         margin: 1rem;
-        border-radius: 4px;
+        border-radius: 0;
     }
 
-    .opcion {
-        padding: 0.8rem 1rem;
-        font-size: 0.9rem;
+    header h1 {
+        font-size: 1.8rem;
+        letter-spacing: 3px;
     }
 
+    .pregunta {
+        font-size: 1rem;
+    }
+
+    .opcion,
     .btn-siguiente,
     .btn-reiniciar {
-        font-size: 0.9rem;
+        font-size: 0.82rem;
         padding: 0.8rem;
+    }
+}
+
+/* ---------- Accesibilidad: menos movimiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+    body::after,
+    header h1,
+    .resultado-final h2,
+    .mensaje-final::after,
+    .opcion.correcta,
+    .opcion.incorrecta,
+    .btn-reiniciar {
+        animation: none;
     }
 }

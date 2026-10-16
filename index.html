@@ -14,21 +14,25 @@
         </header>
 
         <section class="quiz-section" id="quiz-section">
-            <!-- La pregunta y opciones se insertan dinámicamente -->
-            <div class="pregunta" id="pregunta">Selecciona una pregunta...</div>
-
-            <div class="opciones" id="opciones">
-                <!-- Las opciones se insertan desde quiz.js -->
-            </div>
-
+            <!-- Número de pregunta y barra de progreso -->
             <div class="progreso">
                 <span id="progreso">1 de 20</span>
-                <div class="barra-progreso" id="barra-progreso">
-                    <div class="progreso-actual" id="progreso-actual"></div>
+                <div class="barra-progreso">
+                    <div class="progreso-actual" id="barra-progreso"></div>
                 </div>
             </div>
 
-            <button class="btn-siguiente" id="siguiente">Responder</button>
+            <!-- Enunciado de la pregunta actual -->
+            <h2 class="pregunta" id="pregunta">Cargando pregunta...</h2>
+
+            <!-- Aquí JavaScript inserta los 4 botones de opción -->
+            <div class="opciones" id="opciones"></div>
+
+            <!-- Explicación que aparece tras responder -->
+            <p class="explicacion" id="explicacion" hidden></p>
+
+            <!-- Botón para avanzar -->
+            <button class="btn-siguiente" id="siguiente" disabled>Responder</button>
         </section>
 
         <footer>
@@ -36,7 +40,8 @@
         </footer>
     </main>
 
-    <script src="app.js"></script>
+    <!-- quiz.js debe cargarse ANTES que app.js (define quizData) -->
     <script src="quiz.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
