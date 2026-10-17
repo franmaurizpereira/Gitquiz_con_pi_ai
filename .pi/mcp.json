@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--executable-path",
+        "/home/samael/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+        "--headless",
+        "--no-sandbox"
+      ]
+    }
+  }
+}
